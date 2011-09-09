@@ -11,6 +11,7 @@
 
 #import "ANImageBitmapRep.h"
 
+BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 
 @class RSColorPickerView;
 @protocol RSColorPickerViewDelegate <NSObject>
@@ -37,5 +38,13 @@
 @property (nonatomic, assign) BOOL cropToCircle;
 @property (nonatomic, assign) CGFloat brightness;
 @property (assign) id<RSColorPickerViewDelegate> delegate;
+
+/**
+ * Hue, saturation and briteness of the selected point
+ * @Reference: Taken From ars/uicolor-utilities 
+ * http://github.com/ars/uicolor-utilities
+ */
+-(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV;
+
 
 @end

@@ -11,6 +11,7 @@
 #import "ANImageBitmapRep.h"
 
 @implementation RSBrightnessSlider
+@synthesize useCustomSlider, isColorfull;
 
 -(id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
@@ -22,12 +23,16 @@
 		self.enabled = YES;
 		self.userInteractionEnabled = YES;
 		
+		self.isColorfull     = NO;
+		self.useCustomSlider = NO;
+		
 		[self addTarget:self action:@selector(myValueChanged:) forControlEvents:UIControlEventValueChanged];
 	}
 	return self;
 }
 
 -(void)setUseCustomSlider:(BOOL)use {
+	useCustomSlider = use;
 	if (use) {
 		[self setupImages];
 	}
@@ -38,11 +43,21 @@
 }
 
 -(void)setupImages {
+	
+	if (!self.useCustomSlider){return;} //Bail if not using custom slider
+	
+	CGFloat hue, saturation;
+	if (isColorfull){
+		[colorPicker selectionToHue:&hue saturation:&saturation brightness:nil];
+	}else{
+		hue = 0.0f; saturation = 0.0f;
+	}
+	
 	ANImageBitmapRep *myRep = [[ANImageBitmapRep alloc] initWithSize:BMPointMake(self.frame.size.width, self.frame.size.height)];
 	for (int x = 0; x < myRep.bitmapSize.x; x++) {
 		CGFloat percGray = (CGFloat)x / (CGFloat)myRep.bitmapSize.x;
 		for (int y = 0; y < myRep.bitmapSize.y; y++) {
-			[myRep setPixel:BMPixelMake(percGray, percGray, percGray, 1.0) atPoint:BMPointMake(x, y)];
+			[myRep setPixel:pixelFromHSV(hue, saturation, percGray) atPoint:BMPointMake(x, y)];
 		}
 	}
 	//[self setBackgroundColor:[UIColor colorWithPatternImage:[myRep image]]];

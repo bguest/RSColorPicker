@@ -81,7 +81,6 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	brightness = bright;
 	bitmapNeedsUpdate = YES;
 	[self setNeedsDisplay];
-	[delegate colorPickerDidChangeSelection:self];
 }
 
 -(void)setCropToCircle:(BOOL)circle {
@@ -133,8 +132,58 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 -(UIColor*)selectionColor {
 	return UIColorFromBMPixel([rep getPixelAtPoint:BMPointFromPoint(selection)]);
 }
+
+
+
 -(CGPoint)selection {
 	return selection;
+}
+
+/**
+ * Hue saturation and briteness of the selected point
+ * @Reference: Taken from ars/uicolor-utilities 
+ * http://github.com/ars/uicolor-utilities
+ */
+-(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV{
+	
+	//Get red green and blue from selection
+	BMPixel pixel = [rep getPixelAtPoint:BMPointFromPoint(selection)];
+	CGFloat r = pixel.red, b = pixel.blue, g = pixel.green;
+	
+	CGFloat h,s,v;
+	
+	// From Foley and Van Dam
+	
+	CGFloat max = MAX(r, MAX(g, b));
+	CGFloat min = MIN(r, MIN(g, b));
+	
+	// Brightness
+	v = max;
+	
+	// Saturation
+	s = (max != 0.0f) ? ((max - min) / max) : 0.0f;
+	
+	if (s == 0.0f) {
+		// No saturation, so undefined hue
+		h = 0.0f;
+	} else {
+		// Determine hue
+		CGFloat rc = (max - r) / (max - min);		// Distance of color from red
+		CGFloat gc = (max - g) / (max - min);		// Distance of color from green
+		CGFloat bc = (max - b) / (max - min);		// Distance of color from blue
+		
+		if (r == max) h = bc - gc;					// resulting color between yellow and magenta
+		else if (g == max) h = 2 + rc - bc;			// resulting color between cyan and yellow
+		else /* if (b == max) */ h = 4 + gc - rc;	// resulting color between magenta and cyan
+		
+		h *= 60.0f;									// Convert to degrees
+		if (h < 0.0f) h += 360.0f;					// Make non-negative
+		h /= 360.0f;                        //Convert to decimal
+	}
+	
+	if (pH) *pH = h;
+	if (pS) *pS = s;
+	if (pV) *pV = v;
 }
 
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint {

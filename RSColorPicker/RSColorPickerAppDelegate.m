@@ -23,7 +23,9 @@
 	
 	brightnessSlider = [[RSBrightnessSlider alloc] initWithFrame:CGRectMake(10.0, 360.0, 300.0, 30.0)];
 	[brightnessSlider setColorPicker:colorPicker];
-	[brightnessSlider setUseCustomSlider:YES]; // Defaults to NO
+	[brightnessSlider setUseCustomSlider:YES];  // Defaults to NO
+	brightnessSlider.isColorfull = YES;         // Defaults to NO
+	[brightnessSlider addTarget:self action:@selector(updateColorPatch) forControlEvents:UIControlEventValueChanged];
 	
 	colorPatch = [[UIView alloc] initWithFrame:CGRectMake(10.0, 400.0, 300.0, 30.0)];
 	
@@ -37,6 +39,11 @@
 
 -(void)colorPickerDidChangeSelection:(RSColorPickerView *)cp {
 	colorPatch.backgroundColor = [cp selectionColor];
+	[brightnessSlider setupImages];
+}
+
+-(void)updateColorPatch{
+	colorPatch.backgroundColor = [colorPicker selectionColor];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

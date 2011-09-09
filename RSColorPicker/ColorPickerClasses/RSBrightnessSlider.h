@@ -12,9 +12,12 @@
 
 @interface RSBrightnessSlider : UISlider {
 	RSColorPickerView *colorPicker;
+	BOOL useCustomSlider;
+	BOOL isColorfull;
 }
+@property (nonatomic) BOOL isColorfull;
+@property (nonatomic) BOOL useCustomSlider;
 
--(void)setUseCustomSlider:(BOOL)use;
 -(void)setupImages;
 
 -(void)setColorPicker:(RSColorPickerView*)cp;
