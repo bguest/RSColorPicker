@@ -49,7 +49,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 
 @implementation RSColorPickerView
 
-@synthesize brightness, cropToCircle, delegate;
+@synthesize brightness, cropToCircle, delegate, isOrthoganal;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -91,28 +91,36 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 
 -(void)genBitmap {
 	if (!bitmapNeedsUpdate) { return; }
-	CGFloat radius = (self.frame.size.width / 2.0);
+	CGSize  size = self.frame.size;
+	CGFloat radius = (size.width / 2.0);
 	CGFloat relX = 0.0;
 	CGFloat relY = 0.0;
 	
-	for (int x = 0; x < self.frame.size.width; x++) {
-		relX = x - radius;
+	for (int x = 0; x < size.width; x++) {
+		relX = (self.isOrthoganal ? x/size.width : x - radius);
 		
-		for (int y = 0; y < self.frame.size.height; y++) {
-			relY = radius - y;
+		for (int y = 0; y < size.height; y++) {
+			BMPixel thisPixel;
 			
-			CGFloat r_distance = sqrt((relX * relX)+(relY * relY));
-			if (fabsf(r_distance) > radius && cropToCircle == YES) {
-				[rep setPixel:BMPixelMake(0.0, 0.0, 0.0, 0.0) atPoint:BMPointMake(x, y)];
-				continue;
+			if (isOrthoganal){
+				relY = 1- y/size.width;
+				thisPixel = pixelFromHSV(relX, relY, self.brightness);
+			}else{
+				relY = radius - y;
+				
+				CGFloat r_distance = sqrt((relX * relX)+(relY * relY));
+				if (fabsf(r_distance) > radius && cropToCircle == YES) {
+					[rep setPixel:BMPixelMake(0.0, 0.0, 0.0, 0.0) atPoint:BMPointMake(x, y)];
+					continue;
+				}
+				r_distance = fmin(r_distance, radius);
+				
+				CGFloat angle = atan2(relY, relX);
+				if (angle < 0.0) { angle = (2.0 * M_PI)+angle; }
+				
+				CGFloat perc_angle = angle / (2.0 * M_PI);
+				thisPixel = pixelFromHSV(perc_angle, r_distance/radius, self.brightness);
 			}
-			r_distance = fmin(r_distance, radius);
-			
-			CGFloat angle = atan2(relY, relX);
-			if (angle < 0.0) { angle = (2.0 * M_PI)+angle; }
-			
-			CGFloat perc_angle = angle / (2.0 * M_PI);
-			BMPixel thisPixel = pixelFromHSV(perc_angle, r_distance/radius, self.brightness);
 			[rep setPixel:thisPixel atPoint:BMPointMake(x, y)];
 		}
 	}
@@ -187,7 +195,14 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 }
 
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint {
-	if (!cropToCircle) return touchPoint;
+	if (!cropToCircle || isOrthoganal){
+		//Constrain point to inside of bounds
+		touchPoint.x = MIN(CGRectGetMaxX(self.bounds), touchPoint.x);
+		touchPoint.x = MAX(CGRectGetMinX(self.bounds), touchPoint.x);
+		touchPoint.y = MIN(CGRectGetMaxX(self.bounds), touchPoint.y);
+		touchPoint.y = MAX(CGRectGetMinX(self.bounds), touchPoint.y);
+		return touchPoint;
+	};
 	
 	BMPixel pixel = BMPixelMake(0.0, 0.0, 0.0, 0.0);
 	if (IS_INSIDE(touchPoint)) {

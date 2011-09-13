@@ -22,6 +22,8 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 	ANImageBitmapRep *rep;
 	CGFloat brightness;
 	BOOL cropToCircle;
+	BOOL isOrthoganal;	//YES ~> Square with saturation on Y axis
+								//NO  ~> Saturation on radial axis
 	
 	UIView *selectionView;
 	CGPoint selection;
@@ -35,7 +37,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 -(UIColor*)selectionColor;
 -(CGPoint)selection;
 
-@property (nonatomic, assign) BOOL cropToCircle;
+@property (nonatomic, assign) BOOL cropToCircle, isOrthoganal;
 @property (nonatomic, assign) CGFloat brightness;
 @property (assign) id<RSColorPickerViewDelegate> delegate;
 

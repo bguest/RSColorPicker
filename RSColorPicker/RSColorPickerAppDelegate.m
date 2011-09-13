@@ -19,12 +19,14 @@
 	[colorPicker setDelegate:self];
 	[colorPicker setBrightness:1.0];
 	//[colorPicker setCropToCircle:NO]; // Defaults to YES (and you can set BG color)
+	colorPicker.isOrthoganal = YES;
 	[colorPicker setBackgroundColor:[UIColor clearColor]];
 	
 	brightnessSlider = [[RSBrightnessSlider alloc] initWithFrame:CGRectMake(10.0, 360.0, 300.0, 30.0)];
 	[brightnessSlider setColorPicker:colorPicker];
 	[brightnessSlider setUseCustomSlider:YES];  // Defaults to NO
 	brightnessSlider.isColorfull = YES;         // Defaults to NO
+   [brightnessSlider useCustomThumbImageOfStyle:RSHourGlassThumbImageStyle];
 	[brightnessSlider addTarget:self action:@selector(updateColorPatch) forControlEvents:UIControlEventValueChanged];
 	
 	colorPatch = [[UIView alloc] initWithFrame:CGRectMake(10.0, 400.0, 300.0, 30.0)];
