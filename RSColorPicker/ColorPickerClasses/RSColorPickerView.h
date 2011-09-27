@@ -13,7 +13,7 @@
 
 BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 
-@class RSColorPickerView;
+@class RSColorPickerView, BGRSLoupeLayer;
 @protocol RSColorPickerViewDelegate <NSObject>
 -(void)colorPickerDidChangeSelection:(RSColorPickerView*)cp;
 @end
@@ -26,6 +26,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 								//NO  ~> Saturation on radial axis
 	
 	UIView *selectionView;
+   BGRSLoupeLayer* loupeLayer;
 	CGPoint selection;
 	
 	BOOL badTouch;
@@ -48,5 +49,6 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
  */
 -(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV;
 
+-(UIColor*)colorAtPoint:(CGPoint)point; //Returns UIColor at a point in the RSColorPickerView
 
 @end

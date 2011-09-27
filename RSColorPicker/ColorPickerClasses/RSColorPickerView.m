@@ -7,6 +7,7 @@
 //
 
 #import "RSColorPickerView.h"
+#import "BGRSLoupeLayer.h"
 
 // point-related macros
 #define INNER_P(x) (x < 0 ? ceil(x) : floor(x))
@@ -75,6 +76,13 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 		rep = [[ANImageBitmapRep alloc] initWithSize:BMPointFromSize(frame.size)];
 	}
 	return self;
+}
+
+// For Use with Nib.
+-(id)initWithCoder:(NSCoder *)aDecoder{ 
+	if((self = [super initWithCoder:aDecoder])){
+      
+   }
 }
 
 -(void)setBrightness:(CGFloat)bright {
@@ -194,6 +202,14 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	if (pV) *pV = v;
 }
 
+-(UIColor*)colorAtPoint:(CGPoint)point {
+   if (CGRectContainsPoint(self.bounds,point)){
+      return UIColorFromBMPixel([rep getPixelAtPoint:BMPointFromPoint(point)]);
+   }else{
+      return self.backgroundColor;
+   }
+}
+
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint {
 	if (!cropToCircle || isOrthoganal){
 		//Constrain point to inside of bounds
@@ -231,10 +247,20 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 }
 
 -(void)updateSelectionLocation {
-	selectionView.center = selection;
+   selectionView.center = selection;
+
+   [CATransaction setDisableActions:YES];
+   loupeLayer.position = selection;
+   [loupeLayer setNeedsDisplay];
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+   
+   //Lazily load loupeLayer
+   if (!loupeLayer){
+      loupeLayer = [[BGRSLoupeLayer layer] retain];
+   }
+   
 	CGPoint point = [[touches anyObject] locationInView:self];
 	CGPoint circlePoint = [self validPointForTouch:point];
 	
@@ -250,7 +276,9 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	
 	selection = circlePoint;
 	[delegate colorPickerDidChangeSelection:self];
-	[self updateSelectionLocation];
+   [loupeLayer appearInColorPicker:self];
+	
+   [self updateSelectionLocation];
 }
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
 	if (badTouch) return;
@@ -277,6 +305,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	selection = circlePoint;
 	[delegate colorPickerDidChangeSelection:self];
 	[self updateSelectionLocation];
+   [loupeLayer disapear];
 }
 
 
@@ -285,6 +314,9 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 {
 	[rep release];
 	[selectionView release];
+   [loupeLayer release];
+   loupeLayer = nil;
+   
 	[super dealloc];
 }
 

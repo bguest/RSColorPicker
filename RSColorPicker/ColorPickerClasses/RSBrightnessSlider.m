@@ -82,8 +82,11 @@ UIImage* RSHourGlassThumbImage(CGSize size, CGFloat cWidth){
 	
 	CGImageRef cgImage = CGBitmapContextCreateImage(ctx);
 	CGContextRelease(ctx);
+   
+   UIImage* image = [UIImage imageWithCGImage:cgImage]; 
+   CGImageRelease(cgImage);
 	
-	return [UIImage imageWithCGImage:cgImage];
+	return image;
 }
 
 /**
@@ -132,7 +135,10 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
    CGPathRelease(loopPath);
    CGContextRelease(ctx);
    
-   return [UIImage imageWithCGImage:cgImage];
+   UIImage* image = [UIImage imageWithCGImage:cgImage]; 
+   CGImageRelease(cgImage);
+	
+	return image;
 }
 
  
