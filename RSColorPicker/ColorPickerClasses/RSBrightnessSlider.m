@@ -143,24 +143,41 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 
  
 @implementation RSBrightnessSlider
-@synthesize useCustomSlider, isColorfull;
+@synthesize useCustomSlider, isColorfull, colorPicker;
 
+//Called when created using code
 -(id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-		self.minimumValue = 0.0;
-		self.maximumValue = 1.0;
-		self.continuous = YES;
-		
-		self.enabled = YES;
-		self.userInteractionEnabled = YES;
-		
-		self.isColorfull     = NO;
-		self.useCustomSlider = NO;
-		
-		[self addTarget:self action:@selector(myValueChanged:) forControlEvents:UIControlEventValueChanged];
+      [self setup];
 	}
 	return self;
+}
+
+//Called when created using IB
+-(id)initWithCoder:(NSCoder *)aDecoder{
+   self = [super initWithCoder:aDecoder];
+   if (self){
+      [self setup];
+   }
+   return self;
+}
+/**
+ * Setup code preformed for both initWithCoder when used in a nib and initWithFrame 
+ * when used progromaticly
+ */
+-(void)setup{
+   self.minimumValue = 0.0;
+   self.maximumValue = 1.0;
+   self.continuous = YES;
+   
+   self.enabled = YES;
+   self.userInteractionEnabled = YES;
+   
+   self.isColorfull     = NO;
+   self.useCustomSlider = NO;
+   
+   [self addTarget:self action:@selector(myValueChanged:) forControlEvents:UIControlEventValueChanged];
 }
 
 -(void)setUseCustomSlider:(BOOL)use {
@@ -171,7 +188,7 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 }
 
 -(void)myValueChanged:(id)notif {
-	[colorPicker setBrightness:self.value];
+	[self.colorPicker setBrightness:self.value];
 }
 
 -(void)setupImages {
@@ -180,7 +197,7 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	
 	CGFloat hue, saturation;
 	if (isColorfull){
-		[colorPicker selectionToHue:&hue saturation:&saturation brightness:nil];
+		[self.colorPicker selectionToHue:&hue saturation:&saturation brightness:nil];
 	}else{
 		hue = 0.0f; saturation = 0.0f;
 	}

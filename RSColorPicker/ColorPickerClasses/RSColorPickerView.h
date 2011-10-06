@@ -13,9 +13,12 @@
 
 BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 
-@class RSColorPickerView, BGRSLoupeLayer;
+@class RSColorPickerView, BGRSLoupeLayer, RSBrightnessSlider;
 @protocol RSColorPickerViewDelegate <NSObject>
+
+@required
 -(void)colorPickerDidChangeSelection:(RSColorPickerView*)cp;
+
 @end
 
 @interface RSColorPickerView : UIView {
@@ -40,7 +43,8 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 
 @property (nonatomic, assign) BOOL cropToCircle, isOrthoganal;
 @property (nonatomic, assign) CGFloat brightness;
-@property (assign) id<RSColorPickerViewDelegate> delegate;
+@property (nonatomic, assign) IBOutlet id<RSColorPickerViewDelegate> delegate;
+@property (nonatomic, assign) IBOutlet RSBrightnessSlider* brightnessSlider;
 
 /**
  * Hue, saturation and briteness of the selected point

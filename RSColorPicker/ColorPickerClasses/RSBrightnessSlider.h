@@ -23,10 +23,10 @@ typedef enum {                   //Custom Thumb Image Slider Types
 }
 @property (nonatomic) BOOL isColorfull;
 @property (nonatomic) BOOL useCustomSlider;
+@property (nonatomic,assign) IBOutlet RSColorPickerView* colorPicker;
 
+-(void)setup;
 -(void)setupImages;
 -(void)useCustomThumbImageOfStyle:(RSThumbImageStyle)style;
-
--(void)setColorPicker:(RSColorPickerView*)cp;
 
 @end

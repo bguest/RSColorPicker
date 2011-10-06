@@ -8,6 +8,7 @@
 
 #import "RSColorPickerView.h"
 #import "BGRSLoupeLayer.h"
+#import "RSBrightnessSlider.h"
 
 // point-related macros
 #define INNER_P(x) (x < 0 ? ceil(x) : floor(x))
@@ -42,7 +43,8 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 }
 
 
-@interface RSColorPickerView (Private)
+@interface RSColorPickerView () //Private Methods
+-(void)setup;
 -(void)updateSelectionLocation;
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint;
 @end
@@ -50,7 +52,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 
 @implementation RSColorPickerView
 
-@synthesize brightness, cropToCircle, delegate, isOrthoganal;
+@synthesize brightness, cropToCircle, delegate, isOrthoganal, brightnessSlider;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -59,21 +61,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	
 	self = [super initWithFrame:frame];
 	if (self) {
-		cropToCircle = YES;
-		badTouch = NO;
-		bitmapNeedsUpdate = YES;
-		
-		selection = CGPointMake(sqr/2, sqr/2);
-		selectionView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 18.0, 18.0)];
-		selectionView.backgroundColor = [UIColor clearColor];
-		selectionView.layer.borderWidth = 2.0;
-		selectionView.layer.borderColor = [UIColor colorWithWhite:0.1 alpha:1.0].CGColor;
-		selectionView.layer.cornerRadius = 9.0;
-		[self updateSelectionLocation];
-		[self addSubview:selectionView];
-		
-		self.brightness = 1.0;
-		rep = [[ANImageBitmapRep alloc] initWithSize:BMPointFromSize(frame.size)];
+      [self setup];
 	}
 	return self;
 }
@@ -81,8 +69,32 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 // For Use with Nib.
 -(id)initWithCoder:(NSCoder *)aDecoder{ 
 	if((self = [super initWithCoder:aDecoder])){
-      
+      [self setup];
    }
+   return self;
+}
+
+/**
+ * Setup code preformed for both initWithCoder when used in a nib and initWithFrame 
+ * when used progromaticly
+ */
+- (void)setup{
+   cropToCircle = YES;
+   badTouch = NO;
+   bitmapNeedsUpdate = YES;
+   
+   CGFloat sqr = self.bounds.size.width;
+   selection = CGPointMake(sqr/2, sqr/2);
+   selectionView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, 18.0, 18.0)];
+   selectionView.backgroundColor = [UIColor clearColor];
+   selectionView.layer.borderWidth = 2.0;
+   selectionView.layer.borderColor = [UIColor colorWithWhite:0.1 alpha:1.0].CGColor;
+   selectionView.layer.cornerRadius = 9.0;
+   [self updateSelectionLocation];
+   [self addSubview:selectionView];
+   
+   self.brightness = 1.0;
+   rep = [[ANImageBitmapRep alloc] initWithSize:BMPointFromSize(self.frame.size)];
 }
 
 -(void)setBrightness:(CGFloat)bright {
@@ -248,6 +260,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 
 -(void)updateSelectionLocation {
    selectionView.center = selection;
+   [brightnessSlider setupImages];
 
    [CATransaction setDisableActions:YES];
    loupeLayer.position = selection;

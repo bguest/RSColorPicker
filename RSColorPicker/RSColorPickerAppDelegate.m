@@ -23,13 +23,16 @@
 	[colorPicker setBackgroundColor:[UIColor clearColor]];
 	
 	brightnessSlider = [[RSBrightnessSlider alloc] initWithFrame:CGRectMake(10.0, 360.0, 300.0, 30.0)];
-	[brightnessSlider setColorPicker:colorPicker];
 	[brightnessSlider setUseCustomSlider:YES];  // Defaults to NO
 	brightnessSlider.isColorfull = YES;         // Defaults to NO
    [brightnessSlider useCustomThumbImageOfStyle:RSHourGlassThumbImageStyle];
 	[brightnessSlider addTarget:self action:@selector(updateColorPatch) forControlEvents:UIControlEventValueChanged];
 	
 	colorPatch = [[UIView alloc] initWithFrame:CGRectMake(10.0, 400.0, 300.0, 30.0)];
+   
+   //Connect Brightness Slider and Color Picker
+   colorPicker.brightnessSlider = brightnessSlider;
+   brightnessSlider.colorPicker = colorPicker;
 	
 	[self.window addSubview:colorPicker];
 	[self.window addSubview:brightnessSlider];
@@ -41,7 +44,6 @@
 
 -(void)colorPickerDidChangeSelection:(RSColorPickerView *)cp {
 	colorPatch.backgroundColor = [cp selectionColor];
-	[brightnessSlider setupImages];
 }
 
 -(void)updateColorPatch{

@@ -39,6 +39,7 @@ This is licensed under the BSD license (found at the bottom of this file). You k
 ![Example Color Picker Implementation](https://github.com/RSully/RSColorPicker/raw/master/Example.png)
 ![Example Color Picker with Custom Slider](https://github.com/RSully/RSColorPicker/raw/master/Example2.png)
 ![Example Color Picker as Square](https://github.com/RSully/RSColorPicker/raw/master/Example3.png)
+![Example Color Picker with Loupe](https://github.com/bguest/RSColorPicker/raw/master/Example4.png)
 
 
 
