@@ -8,25 +8,30 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum {                   //Custom Thumb Image Slider Types
-   RSHourGlassThumbImageStyle = 0,
-   RSArrowLoopThumbImageStyle,
+typedef enum {    
+   RSThumbImageStyleDefault = 0,   //Custom Thumb Image Slider Types
+   RSThumbImageStyleHourGlass,
+   RSThumbImageStyleArrowLoop,
 } RSThumbImageStyle;
+
+typedef enum { 
+   RSSliderBackgroundStyleDefault = 0,
+   RSSliderBackgroundStyleGrayscale,
+   RSSliderBackgroundStyleColorfull,
+} RSSliderBackgroundStyle;
 
 @class RSColorPickerView;
 
 @interface RSBrightnessSlider : UISlider {
 	RSColorPickerView *colorPicker;
    
-	BOOL useCustomSlider;
-	BOOL isColorfull;
+   RSSliderBackgroundStyle backgroundStyle;
 }
-@property (nonatomic) BOOL isColorfull;
-@property (nonatomic) BOOL useCustomSlider;
-@property (nonatomic,assign) IBOutlet RSColorPickerView* colorPicker;
+@property (nonatomic) RSSliderBackgroundStyle backgroundStyle;
+@property (nonatomic, assign) IBOutlet RSColorPickerView* colorPicker;
 
 -(void)setup;
--(void)setupImages;
+-(void)updateBackground;
 -(void)useCustomThumbImageOfStyle:(RSThumbImageStyle)style;
 
 @end

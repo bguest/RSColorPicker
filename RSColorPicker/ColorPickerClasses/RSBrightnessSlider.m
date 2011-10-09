@@ -141,9 +141,15 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	return image;
 }
 
+@interface RSBrightnessSlider() //Private Methods
+
+-(void)setupImages;
+
+@end
+
  
 @implementation RSBrightnessSlider
-@synthesize useCustomSlider, isColorfull, colorPicker;
+@synthesize colorPicker, backgroundStyle;
 
 //Called when created using code
 -(id)initWithFrame:(CGRect)frame {
@@ -174,33 +180,46 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
    self.enabled = YES;
    self.userInteractionEnabled = YES;
    
-   self.isColorfull     = NO;
-   self.useCustomSlider = NO;
+   self.backgroundStyle = RSSliderBackgroundStyleDefault;
    
    [self addTarget:self action:@selector(myValueChanged:) forControlEvents:UIControlEventValueChanged];
-}
-
--(void)setUseCustomSlider:(BOOL)use {
-	useCustomSlider = use;
-	if (use) {
-		[self setupImages];
-	}
 }
 
 -(void)myValueChanged:(id)notif {
 	[self.colorPicker setBrightness:self.value];
 }
 
+-(void)setBackgroundStyle:(RSSliderBackgroundStyle)backgroundStyle_{
+   backgroundStyle = backgroundStyle_;
+   [self updateBackground];
+}
+
+/**
+ * This method will be deprecated eventually
+ */
 -(void)setupImages {
-	
-	if (!self.useCustomSlider){return;} //Bail if not using custom slider
-	
-	CGFloat hue, saturation;
-	if (isColorfull){
-		[self.colorPicker selectionToHue:&hue saturation:&saturation brightness:nil];
-	}else{
-		hue = 0.0f; saturation = 0.0f;
-	}
+   [self updateBackground];
+}
+
+/**
+ * This method sets up the background approprately
+ */
+-(void)updateBackground{
+   
+   CGFloat hue, saturation;
+
+   switch (self.backgroundStyle) {
+      case RSSliderBackgroundStyleDefault:
+         return;
+      case RSSliderBackgroundStyleGrayscale:
+         hue = 0.0f; saturation = 0.0f;
+         break;
+      case RSSliderBackgroundStyleColorfull:	
+         [self.colorPicker selectionToHue:&hue saturation:&saturation brightness:nil]; 
+         break;
+      default:
+         return;
+   }
 	
 	ANImageBitmapRep *myRep = [[ANImageBitmapRep alloc] initWithSize:BMPointMake(self.frame.size.width, self.frame.size.height)];
 	for (int x = 0; x < myRep.bitmapSize.x; x++) {
@@ -214,6 +233,7 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	[self setMaximumTrackImage:[myRep image] forState:UIControlStateNormal];
 	
 	[myRep release];
+   
 }
 
 -(void)useCustomThumbImageOfStyle:(RSThumbImageStyle)style{
@@ -223,16 +243,20 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
    CGSize loopSize;
 	
 	switch (style) {
+      case RSThumbImageStyleDefault:
+         return; // Do Nothing
          
-      case RSArrowLoopThumbImageStyle:
+      case RSThumbImageStyleArrowLoop:
          sliderSize.width = 10;
          loopSize = CGSizeMake(4, sliderSize.height - 6);
          thumbImage = RSArrowLoopThumbImage(sliderSize, loopSize);
          break;
-		default:
+		case RSThumbImageStyleHourGlass:
 			sliderSize.width = 0.40f*sliderSize.height;
 			thumbImage = RSHourGlassThumbImage(sliderSize,3);
 			break;
+      default:
+         return; //Again do nothing.
 	}
    [self setThumbImage:thumbImage forState:UIControlStateNormal];
    [self setThumbImage:thumbImage forState:UIControlStateHighlighted];

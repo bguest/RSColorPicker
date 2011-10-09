@@ -15,25 +15,30 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	colorPicker = [[RSColorPickerView alloc] initWithFrame:CGRectMake(10.0, 40.0, 300.0, 300.0)];
-	[colorPicker setDelegate:self];
-	[colorPicker setBrightness:1.0];
-	//[colorPicker setCropToCircle:NO]; // Defaults to YES (and you can set BG color)
-	colorPicker.isOrthoganal = YES;
-	[colorPicker setBackgroundColor:[UIColor clearColor]];
-	
-	brightnessSlider = [[RSBrightnessSlider alloc] initWithFrame:CGRectMake(10.0, 360.0, 300.0, 30.0)];
-	[brightnessSlider setUseCustomSlider:YES];  // Defaults to NO
-	brightnessSlider.isColorfull = YES;         // Defaults to NO
-   [brightnessSlider useCustomThumbImageOfStyle:RSHourGlassThumbImageStyle];
-	[brightnessSlider addTarget:self action:@selector(updateColorPatch) forControlEvents:UIControlEventValueChanged];
-	
-	colorPatch = [[UIView alloc] initWithFrame:CGRectMake(10.0, 400.0, 300.0, 30.0)];
+	//Alocate color picker and brightness slider
+   colorPicker = [[RSColorPickerView alloc] initWithFrame:CGRectMake(10.0, 40.0, 300.0, 300.0)];
+   brightnessSlider = [[RSBrightnessSlider alloc] initWithFrame:CGRectMake(10.0, 360.0, 300.0, 30.0)];
    
    //Connect Brightness Slider and Color Picker
    colorPicker.brightnessSlider = brightnessSlider;
    brightnessSlider.colorPicker = colorPicker;
 	
+   //Setup Color Picker
+   [colorPicker setDelegate:self];
+	[colorPicker setBrightness:1.0];
+	//[colorPicker setCropToCircle:NO]; // Defaults to YES (and you can set BG color)
+	colorPicker.isOrthoganal = YES;
+	[colorPicker setBackgroundColor:[UIColor clearColor]];
+	
+   //Set up Brightness Slider
+	brightnessSlider.backgroundStyle = RSSliderBackgroundStyleColorfull;
+   [brightnessSlider useCustomThumbImageOfStyle:RSThumbImageStyleHourGlass];
+	[brightnessSlider addTarget:self action:@selector(updateColorPatch) forControlEvents:UIControlEventValueChanged];
+	
+   //Alocate color patch
+	colorPatch = [[UIView alloc] initWithFrame:CGRectMake(10.0, 400.0, 300.0, 30.0)];
+   
+   //Add Views to window
 	[self.window addSubview:colorPicker];
 	[self.window addSubview:brightnessSlider];
 	[self.window addSubview:colorPatch];

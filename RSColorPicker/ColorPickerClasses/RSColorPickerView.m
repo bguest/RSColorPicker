@@ -41,10 +41,57 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 	}
 	return BMPixelMake(V, var_1, var_2, 1.0);
 }
-
+/**
+ * Conversion from red, green and blue to hue, saturation and brightness
+ * @Reference: Taken from ars/uicolor-utilities 
+ * http://github.com/ars/uicolor-utilities
+ */
+void rgbToHsv(CGFloat r,   /* IN: Red */
+              CGFloat g,   /* IN: Green */
+              CGFloat b,   /* IN: Blue */
+              CGFloat *pH, /* OUT: Hue */
+              CGFloat *pS, /* OUT: Saturation */
+              CGFloat *pV) /* OUT: Brightness */
+{
+	CGFloat h,s,v;
+	
+	// From Foley and Van Dam
+	
+	CGFloat max = MAX(r, MAX(g, b));
+	CGFloat min = MIN(r, MIN(g, b));
+	
+	// Brightness
+	v = max;
+	
+	// Saturation
+	s = (max != 0.0f) ? ((max - min) / max) : 0.0f;
+	
+	if (s == 0.0f) {
+		// No saturation, so undefined hue
+		h = 0.0f;
+	} else {
+		// Determine hue
+		CGFloat rc = (max - r) / (max - min);		// Distance of color from red
+		CGFloat gc = (max - g) / (max - min);		// Distance of color from green
+		CGFloat bc = (max - b) / (max - min);		// Distance of color from blue
+		
+		if (r == max) h = bc - gc;                // resulting color between yellow and magenta
+		else if (g == max) h = 2 + rc - bc;			// resulting color between cyan and yellow
+		else /* if (b == max) */ h = 4 + gc - rc;	// resulting color between magenta and cyan
+		
+		h *= 60.0f;									// Convert to degrees
+		if (h < 0.0f) h += 360.0f;				// Make non-negative
+		h /= 360.0f;                        // Convert to decimal
+	}
+	
+	if (pH) *pH = h;
+   if (pS) *pS = s;
+   if (pV) *pV = v;
+}
 
 @interface RSColorPickerView () //Private Methods
 -(void)setup;
+-(void)genBitmap;
 -(void)updateSelectionLocation;
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint;
 @end
@@ -53,6 +100,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 @implementation RSColorPickerView
 
 @synthesize brightness, cropToCircle, delegate, isOrthoganal, brightnessSlider;
+@dynamic selectionColor;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -106,8 +154,17 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 -(void)setCropToCircle:(BOOL)circle {
 	if (circle == cropToCircle) { return; }
 	cropToCircle = circle;
+   bitmapNeedsUpdate = YES;
 	[self setNeedsDisplay];
 }
+
+-(void)setIsOrthoganal:(BOOL)isOrthoganal_{
+   if (isOrthoganal_ == isOrthoganal){return;}
+   isOrthoganal = isOrthoganal_;
+   bitmapNeedsUpdate = YES;
+   [self setNeedsDisplay];
+}
+
 
 -(void)genBitmap {
 	if (!bitmapNeedsUpdate) { return; }
@@ -152,15 +209,54 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-	[self genBitmap];
+   [self genBitmap];
 	[[rep image] drawInRect:rect];
 }
 
 
 -(UIColor*)selectionColor {
+   [self genBitmap];        //Make sure bitmap is uptodate before getting selection color
 	return UIColorFromBMPixel([rep getPixelAtPoint:BMPointFromPoint(selection)]);
 }
+-(void)setSelectionColor:(UIColor*)color{
+   const CGFloat *components = CGColorGetComponents(color.CGColor);
+   
+   CGFloat r,g,b;
+	
+   CGColorSpaceModel colorSpaceModel = CGColorSpaceGetModel(CGColorGetColorSpace(color.CGColor));
+   
+	switch (colorSpaceModel) {
+		case kCGColorSpaceModelMonochrome:
+			r = g = b = components[0];
+			break;
+		case kCGColorSpaceModelRGB:
+			r = components[0];
+			g = components[1];
+			b = components[2];
+			break;
+		default:	// We don't know how to handle this model
+         r = g = b = 0;
+	}
 
+   // Convert RGB to HSV
+   CGFloat h,s,v;                   // Hue, Saturation, Brightness;
+   CGSize size = self.bounds.size;
+   
+   rgbToHsv(r, g, b, &h, &s, &v);
+   
+   //Set Selection from HSV
+   if (self.isOrthoganal){
+      selection.x = h*size.width;
+      selection.y = (1-s)*size.height;
+   }else{
+      [NSException raise:@"Impiment This Code" format:nil];
+   }
+
+   //Set Brightness
+   self.brightness = v;
+   
+   [self updateSelectionLocation];
+}
 
 
 -(CGPoint)selection {
@@ -168,50 +264,17 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 }
 
 /**
- * Hue saturation and briteness of the selected point
- * @Reference: Taken from ars/uicolor-utilities 
- * http://github.com/ars/uicolor-utilities
+ * Returns hue saturation and brightness from current selection
  */
 -(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV{
+   
+   [self genBitmap]; // Make sure bitmap is up to date before providing color
 	
 	//Get red green and blue from selection
 	BMPixel pixel = [rep getPixelAtPoint:BMPointFromPoint(selection)];
 	CGFloat r = pixel.red, b = pixel.blue, g = pixel.green;
-	
-	CGFloat h,s,v;
-	
-	// From Foley and Van Dam
-	
-	CGFloat max = MAX(r, MAX(g, b));
-	CGFloat min = MIN(r, MIN(g, b));
-	
-	// Brightness
-	v = max;
-	
-	// Saturation
-	s = (max != 0.0f) ? ((max - min) / max) : 0.0f;
-	
-	if (s == 0.0f) {
-		// No saturation, so undefined hue
-		h = 0.0f;
-	} else {
-		// Determine hue
-		CGFloat rc = (max - r) / (max - min);		// Distance of color from red
-		CGFloat gc = (max - g) / (max - min);		// Distance of color from green
-		CGFloat bc = (max - b) / (max - min);		// Distance of color from blue
-		
-		if (r == max) h = bc - gc;					// resulting color between yellow and magenta
-		else if (g == max) h = 2 + rc - bc;			// resulting color between cyan and yellow
-		else /* if (b == max) */ h = 4 + gc - rc;	// resulting color between magenta and cyan
-		
-		h *= 60.0f;									// Convert to degrees
-		if (h < 0.0f) h += 360.0f;					// Make non-negative
-		h /= 360.0f;                        //Convert to decimal
-	}
-	
-	if (pH) *pH = h;
-	if (pS) *pS = s;
-	if (pV) *pV = v;
+	   
+   rgbToHsv(r, g, b, pH, pS, pV);
 }
 
 -(UIColor*)colorAtPoint:(CGPoint)point {
@@ -260,7 +323,7 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V) {
 
 -(void)updateSelectionLocation {
    selectionView.center = selection;
-   [brightnessSlider setupImages];
+   [brightnessSlider updateBackground];
 
    [CATransaction setDisableActions:YES];
    loupeLayer.position = selection;

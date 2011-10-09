@@ -37,22 +37,16 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 	
 	id<RSColorPickerViewDelegate> delegate;
 }
-
--(UIColor*)selectionColor;
 -(CGPoint)selection;
 
 @property (nonatomic, assign) BOOL cropToCircle, isOrthoganal;
-@property (nonatomic, assign) CGFloat brightness;
+@property (nonatomic, copy) UIColor* selectionColor;
+@property (nonatomic) CGFloat brightness;
 @property (nonatomic, assign) IBOutlet id<RSColorPickerViewDelegate> delegate;
 @property (nonatomic, assign) IBOutlet RSBrightnessSlider* brightnessSlider;
 
-/**
- * Hue, saturation and briteness of the selected point
- * @Reference: Taken From ars/uicolor-utilities 
- * http://github.com/ars/uicolor-utilities
- */
--(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV;
 
+-(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV;
 -(UIColor*)colorAtPoint:(CGPoint)point; //Returns UIColor at a point in the RSColorPickerView
 
 @end
