@@ -102,6 +102,9 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 @synthesize brightness, cropToCircle, delegate, isOrthoganal, brightnessSlider;
 @dynamic selectionColor;
 
+#pragma mark - Setup & Teardown
+//--------------------------------------------------------------------------------------------------
+
 - (id)initWithFrame:(CGRect)frame
 {
 	CGFloat sqr = fmin(frame.size.height, frame.size.width);
@@ -145,6 +148,21 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
    rep = [[ANImageBitmapRep alloc] initWithSize:BMPointFromSize(self.frame.size)];
 }
 
+- (void)dealloc
+{
+	[rep release];
+	[selectionView release];
+   [loupeLayer release];
+   loupeLayer = nil;
+   self.brightnessSlider = nil;
+   self.delegate = nil;
+   
+	[super dealloc];
+}
+
+#pragma mark - Display Properties
+//--------------------------------------------------------------------------------------------------
+
 -(void)setBrightness:(CGFloat)bright {
 	brightness = bright;
 	bitmapNeedsUpdate = YES;
@@ -165,6 +183,8 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
    [self setNeedsDisplay];
 }
 
+#pragma mark - Drawing
+//--------------------------------------------------------------------------------------------------
 
 -(void)genBitmap {
 	if (!bitmapNeedsUpdate) { return; }
@@ -213,6 +233,8 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 	[[rep image] drawInRect:rect];
 }
 
+#pragma mark - Setting and Getting of Color / Selection
+//--------------------------------------------------------------------------------------------------
 
 -(UIColor*)selectionColor {
    [self genBitmap];        //Make sure bitmap is uptodate before getting selection color
@@ -330,6 +352,9 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
    [loupeLayer setNeedsDisplay];
 }
 
+#pragma mark - UIView Methods
+//--------------------------------------------------------------------------------------------------
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
    
    //Lazily load loupeLayer
@@ -382,18 +407,6 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 	[delegate colorPickerDidChangeSelection:self];
 	[self updateSelectionLocation];
    [loupeLayer disapear];
-}
-
-
-
-- (void)dealloc
-{
-	[rep release];
-	[selectionView release];
-   [loupeLayer release];
-   loupeLayer = nil;
-   
-	[super dealloc];
 }
 
 @end

@@ -141,15 +141,21 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	return image;
 }
 
+//===============================================================================================
+
 @interface RSBrightnessSlider() //Private Methods
 
 -(void)setupImages;
 
 @end
 
+//===============================================================================================
  
 @implementation RSBrightnessSlider
 @synthesize colorPicker, backgroundStyle;
+
+#pragma mark - Setup & Teardown
+//-----------------------------------------------------------------------------------------------
 
 //Called when created using code
 -(id)initWithFrame:(CGRect)frame {
@@ -189,10 +195,50 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	[self.colorPicker setBrightness:self.value];
 }
 
+#pragma mark - Properties
+//-----------------------------------------------------------------------------------------------
+
 -(void)setBackgroundStyle:(RSSliderBackgroundStyle)backgroundStyle_{
    backgroundStyle = backgroundStyle_;
    [self updateBackground];
 }
+
+-(void)useCustomThumbImageOfStyle:(RSThumbImageStyle)style{
+   
+   thumbImageStyle = style;
+	
+	CGSize sliderSize = self.bounds.size;
+   UIImage* thumbImage;
+   CGSize loopSize;
+	
+	switch (style) {
+      case RSThumbImageStyleDefault:
+         return; // Do Nothing
+         
+      case RSThumbImageStyleArrowLoop:
+         sliderSize.width = 10;
+         loopSize = CGSizeMake(4, sliderSize.height - 6);
+         thumbImage = RSArrowLoopThumbImage(sliderSize, loopSize);
+         break;
+		case RSThumbImageStyleHourGlass:
+			sliderSize.width = 0.40f*sliderSize.height;
+			thumbImage = RSHourGlassThumbImage(sliderSize,3);
+			break;
+      default:
+         return; //Again do nothing.
+	}
+   [self setThumbImage:thumbImage forState:UIControlStateNormal];
+   [self setThumbImage:thumbImage forState:UIControlStateHighlighted];
+}
+
+-(void)setColorPicker:(RSColorPickerView*)cp {
+	colorPicker = cp;
+	if (!colorPicker) { return; }
+	self.value = [colorPicker brightness];
+}
+
+#pragma mark - Drawing
+//-----------------------------------------------------------------------------------------------
 
 /**
  * This method will be deprecated eventually
@@ -236,36 +282,26 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
    
 }
 
--(void)useCustomThumbImageOfStyle:(RSThumbImageStyle)style{
-	
-	CGSize sliderSize = self.bounds.size;
-   UIImage* thumbImage;
-   CGSize loopSize;
-	
-	switch (style) {
-      case RSThumbImageStyleDefault:
-         return; // Do Nothing
-         
-      case RSThumbImageStyleArrowLoop:
-         sliderSize.width = 10;
-         loopSize = CGSizeMake(4, sliderSize.height - 6);
-         thumbImage = RSArrowLoopThumbImage(sliderSize, loopSize);
-         break;
-		case RSThumbImageStyleHourGlass:
-			sliderSize.width = 0.40f*sliderSize.height;
-			thumbImage = RSHourGlassThumbImage(sliderSize,3);
-			break;
-      default:
-         return; //Again do nothing.
-	}
-   [self setThumbImage:thumbImage forState:UIControlStateNormal];
-   [self setThumbImage:thumbImage forState:UIControlStateHighlighted];
+#pragma mark - Overridden UIView
+//-----------------------------------------------------------------------------------------------
+
+-(void)setBounds:(CGRect)bounds_{
+   if (CGRectEqualToRect(self.bounds, bounds_)){ return;} //Do nothing if equal to current bounds
+   
+   [super setBounds:bounds_];
+   [self useCustomThumbImageOfStyle:thumbImageStyle];
 }
 
--(void)setColorPicker:(RSColorPickerView*)cp {
-	colorPicker = cp;
-	if (!colorPicker) { return; }
-	self.value = [colorPicker brightness];
+#pragma mark - Overridden UIControll
+//-----------------------------------------------------------------------------------------------
+
+- (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event{
+   CGPoint touchPoint = [touch locationInView:self];
+   self.value = touchPoint.x / self.bounds.size.width;
+   [self myValueChanged:nil];
+   
+   return YES;
 }
+
 
 @end

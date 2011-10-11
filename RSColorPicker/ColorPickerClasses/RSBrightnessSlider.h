@@ -26,6 +26,7 @@ typedef enum {
 	RSColorPickerView *colorPicker;
    
    RSSliderBackgroundStyle backgroundStyle;
+   RSThumbImageStyle thumbImageStyle;
 }
 @property (nonatomic) RSSliderBackgroundStyle backgroundStyle;
 @property (nonatomic, assign) IBOutlet RSColorPickerView* colorPicker;
