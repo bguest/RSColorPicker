@@ -143,7 +143,7 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 
 @interface RSBrightnessSlider() //Private Methods
 
--(void)setupImages;
+-(void)setupImages __attribute__((deprecated));
 
 @end
 
