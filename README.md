@@ -1,3 +1,12 @@
+Important
+=========
+
+This project uses submodules as such you must use the `--recursive` flag when cloning the project like this:
+
+    git clone --recursive git@github.com:bguest/RSColorPicker.git
+    
+If this doesn't work it's probably due to the fact that you are using an older version of git, update git and try again.
+
 # Class Files:
 
 ## RSColorPickerView
@@ -7,7 +16,6 @@ Square (circle) color-picker that handles touch events and allows for brightness
 ## RSBrightnessSlider
 
 Basic UISlider subclass that can be used easily with RSColorPickerView. 
-
 
 # Project:
 
