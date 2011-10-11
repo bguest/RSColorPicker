@@ -1,0 +1,3 @@
+[submodule "RSColorPicker/ANImageBitmapRep"]
+	path = RSColorPicker/ANImageBitmapRep
+	url = git@github.com:bguest/ANImageBitmapRep.git
