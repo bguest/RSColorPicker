@@ -193,10 +193,10 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 	CGFloat relX = 0.0;
 	CGFloat relY = 0.0;
 	
-	for (int x = 0; x < size.width; x++) {
+	for (int x = 0; x < rep.bitmapSize.x; x++) {
 		relX = (self.isOrthoganal ? x/size.width : x - radius);
 		
-		for (int y = 0; y < size.height; y++) {
+		for (int y = 0; y < rep.bitmapSize.y; y++) {
 			BMPixel thisPixel;
 			
 			if (isOrthoganal){
@@ -268,8 +268,8 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
    
    //Set Selection from HSV
    if (self.isOrthoganal){
-      selection.x = h*size.width;
-      selection.y = (1-s)*size.height;
+      selection.x = h*(size.width-1);
+      selection.y = (1-s)*(size.height-1);
    }else{
       [NSException raise:@"Impiment This Code" format:nil];
    }
@@ -310,10 +310,10 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 -(CGPoint)validPointForTouch:(CGPoint)touchPoint {
 	if (!cropToCircle || isOrthoganal){
 		//Constrain point to inside of bounds
-		touchPoint.x = MIN(CGRectGetMaxX(self.bounds), touchPoint.x);
-		touchPoint.x = MAX(CGRectGetMinX(self.bounds), touchPoint.x);
-		touchPoint.y = MIN(CGRectGetMaxX(self.bounds), touchPoint.y);
-		touchPoint.y = MAX(CGRectGetMinX(self.bounds), touchPoint.y);
+		touchPoint.x = MIN(CGRectGetMaxX(self.bounds)-1, touchPoint.x);
+		touchPoint.x = MAX(CGRectGetMinX(self.bounds),   touchPoint.x);
+		touchPoint.y = MIN(CGRectGetMaxX(self.bounds)-1, touchPoint.y);
+		touchPoint.y = MAX(CGRectGetMinX(self.bounds),   touchPoint.y);
 		return touchPoint;
 	};
 	
