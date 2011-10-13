@@ -7,6 +7,11 @@ This project uses submodules as such you must use the `--recursive` flag when cl
     
 If this doesn't work it's probably due to the fact that you are using an older version of git, update git and try again.
 
+NOTE
+----
+
+Currently sliding the brightness slider works pretty slow on actual hardware, watch for future commits to speed things up.
+    
 # Class Files:
 
 ## RSColorPickerView
