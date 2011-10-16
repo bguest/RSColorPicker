@@ -23,13 +23,13 @@ typedef enum {
 @class RSColorPickerView;
 
 @interface RSBrightnessSlider : UISlider {
-	RSColorPickerView *colorPicker;
+	RSColorPickerView *__unsafe_unretained colorPicker;
    
    RSSliderBackgroundStyle backgroundStyle;
    RSThumbImageStyle thumbImageStyle;
 }
 @property (nonatomic) RSSliderBackgroundStyle backgroundStyle;
-@property (nonatomic, assign) IBOutlet RSColorPickerView* colorPicker;
+@property (nonatomic, unsafe_unretained) IBOutlet RSColorPickerView* colorPicker;
 
 -(void)setup;
 -(void)updateBackground;

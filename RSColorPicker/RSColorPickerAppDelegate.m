@@ -94,14 +94,5 @@
 	 */
 }
 
-- (void)dealloc
-{
-	[colorPatch release];
-	[brightnessSlider release];
-	[colorPicker release];
-	
-	[_window release];
-	[super dealloc];
-}
 
 @end

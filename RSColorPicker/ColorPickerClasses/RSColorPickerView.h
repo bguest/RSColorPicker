@@ -35,15 +35,15 @@ BMPixel pixelFromHSV(CGFloat H, CGFloat S, CGFloat V);
 	BOOL badTouch;
 	BOOL bitmapNeedsUpdate;
 	
-	id<RSColorPickerViewDelegate> delegate;
+	id<RSColorPickerViewDelegate> __unsafe_unretained delegate;
 }
 -(CGPoint)selection;
 
 @property (nonatomic, assign) BOOL cropToCircle, isOrthoganal;
 @property (nonatomic, copy) UIColor* selectionColor;
 @property (nonatomic) CGFloat brightness;
-@property (nonatomic, assign) IBOutlet id<RSColorPickerViewDelegate> delegate;
-@property (nonatomic, assign) IBOutlet RSBrightnessSlider* brightnessSlider;
+@property (nonatomic, unsafe_unretained) IBOutlet id<RSColorPickerViewDelegate> delegate;
+@property (nonatomic, unsafe_unretained) IBOutlet RSBrightnessSlider* brightnessSlider;
 
 
 -(void)selectionToHue:(CGFloat *)pH saturation:(CGFloat *)pS brightness:(CGFloat *)pV;

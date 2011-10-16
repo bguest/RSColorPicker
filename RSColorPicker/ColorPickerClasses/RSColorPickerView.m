@@ -150,14 +150,10 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
 
 - (void)dealloc
 {
-	[rep release];
-	[selectionView release];
-   [loupeLayer release];
    loupeLayer = nil;
    self.brightnessSlider = nil;
    self.delegate = nil;
    
-	[super dealloc];
 }
 
 #pragma mark - Display Properties
@@ -359,7 +355,7 @@ void rgbToHsv(CGFloat r,   /* IN: Red */
    
    //Lazily load loupeLayer
    if (!loupeLayer){
-      loupeLayer = [[BGRSLoupeLayer layer] retain];
+      loupeLayer = [BGRSLoupeLayer layer];
    }
    
 	CGPoint point = [[touches anyObject] locationInView:self];

@@ -278,7 +278,6 @@ UIImage* RSArrowLoopThumbImage(CGSize size, CGSize loopSize){
 	[self setMinimumTrackImage:[myRep image] forState:UIControlStateNormal];
 	[self setMaximumTrackImage:[myRep image] forState:UIControlStateNormal];
 	
-	[myRep release];
    
 }
 
